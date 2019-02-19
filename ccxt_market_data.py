@@ -49,10 +49,17 @@ args = parse_args()
 # args
 exchange1 = "binance"
 exchange2 = "poloniex"
+exchange3 = "bitfinex"
+exchange4 = "bittrex"
+exchange5 = "kucoin"
+exchange6 = "huobipro"
 
-symbols = "BTC/USDT"
 
-timeframe = "1d"
+
+symbols = "ZEC/BTC"
+
+timeframe = "5m"
+
 
 
 # Get our Exchange
@@ -61,6 +68,7 @@ timeframe = "1d"
 try:
     exchange1_obj = getattr (ccxt, exchange1) ()
     print("I am the exchange", exchange1)
+    print("I am symbols of,", exchange1, exchange1_obj.symbols)
     # print(" I am ccxt", ccxt.binance)
 
 
@@ -73,13 +81,72 @@ except AttributeError:
 # Error check if exchange 2 is handled by ccxt
 
 try:
-    exchange2_obj = getattr (ccxt, exchange2) ()
+    # exchange2_obj = getattr (ccxt, exchange2) ()
+    exchange2_obj = ccxt.poloniex({
+        'enableRateLimit': True,
+        'resolutin':"auto"
+    })
     print("I am the exchange", exchange2)
     # print(" I am ccxt", ccxt.binance)
 
 except AttributeError:
     print('-'*36,' ERROR ','-'*35)
     print('Exchange "{}" not found. Please check the exchange is supported.'.format(exchange2))
+    print('-'*80)
+    quit()
+
+
+# Error check if exchange 2 is handled by ccxt
+
+try:
+    exchange3_obj = getattr (ccxt, exchange3) ()
+    print("I am the exchange", exchange3)
+    # print(" I am ccxt", ccxt.binance)
+
+except AttributeError:
+    print('-'*36,' ERROR ','-'*35)
+    # print('Exchange "{}" not found. Please check the exchange is supported.'.format(exchange2))
+    print('-'*80)
+    quit()
+
+# Error check if exchange 2 is handled by ccxt
+
+try:
+    exchange4_obj = getattr (ccxt, exchange4) ()
+    print("I am the exchange", exchange4)
+    # print(" I am ccxt", ccxt.binance)
+
+except AttributeError:
+    print('-'*36,' ERROR ','-'*35)
+    # print('Exchange "{}" not found. Please check the exchange is supported.'.format(exchange2))
+    print('-'*80)
+    quit()
+
+
+# Error check if exchange 2 is handled by ccxt
+
+try:
+    exchange5_obj = getattr (ccxt, exchange5) ()
+    print("I am the exchange", exchange5)
+    # print(" I am ccxt", ccxt.binance)
+
+except AttributeError:
+    print('-'*36,' ERROR ','-'*35)
+    # print('Exchange "{}" not found. Please check the exchange is supported.'.format(exchange2))
+    print('-'*80)
+    quit()
+
+
+# Error check if exchange 2 is handled by ccxt
+
+try:
+    exchange6_obj = getattr (ccxt, exchange6) ()
+    print("I am the exchange", exchange6)
+    # print(" I am ccxt", ccxt.binance)
+
+except AttributeError:
+    print('-'*36,' ERROR ','-'*35)
+    # print('Exchange "{}" not found. Please check the exchange is supported.'.format(exchange2))
     print('-'*80)
     quit()
 
@@ -137,7 +204,7 @@ if (not hasattr(exchange2_obj, 'timeframes')) or (timeframe not in exchange2_obj
 
 exchange1_obj.load_markets()
 
-print("I am symbols of,", exchange1, exchange1_obj.symbols)
+# print("I am symbols of,", exchange1, exchange1_obj.symbols)
 
 if symbols not in exchange1_obj.symbols:
     print('-'*36,' ERROR ','-'*35)
@@ -152,7 +219,7 @@ if symbols not in exchange1_obj.symbols:
 
 exchange2_obj.load_markets()
 
-print("I am symbols of,", exchange2, exchange2_obj.symbols)
+# print("I am symbols of,", exchange2, exchange2_obj.symbols)
 
 if symbols not in exchange2_obj.symbols:
     print('-'*36,' ERROR ','-'*35)
@@ -162,6 +229,24 @@ if symbols not in exchange2_obj.symbols:
         print('  - ' + key)
     print('-'*80)
     quit()
+
+
+# exchange5_obj.load_markets()
+
+# checks for exchanges
+
+print("I am symbols of,", exchange1, exchange1_obj.symbols)
+print("I am symbols of,", exchange2, exchange2_obj.symbols)
+
+exchange3_obj.load_markets()
+print("I am symbols of,", exchange3, exchange3_obj.symbols)
+
+exchange4_obj.load_markets()
+print("I am symbols of,", exchange4, exchange4_obj.symbols)
+# print("I am symbols of,", exchange5, exchange5_obj.symbols)
+
+exchange6_obj.load_markets()
+print("I am symbols of,", exchange6, exchange6_obj.symbols)
 
 
 
@@ -209,13 +294,11 @@ for index, row in df1.iterrows():
     print(index)
     try: 
         if (df2.loc[index]['Close']) > row['Close']:
-            print ("sell at ", exchange2, df2.loc[index]['Close'], "buy at ", exchange1, row["Close"], "at time ", index);
+            print ("sell at ", exchange2, df2.loc[index]['Close'], "buy at ", exchange1, row["Close"], "at time ", index)
 
 
         if (df2.loc[index]['Close']) < row['Close']:
-            print ("buy at ", exchange2, df2.loc[index]['Close'], "sell at ", exchange1, row["Close"], "at time ", index);
-
-
+            print ("buy at ", exchange2, df2.loc[index]['Close'], "sell at ", exchange1, row["Close"], "at time ", index)
     except KeyError:
         print ("No keys for index", index)
 
