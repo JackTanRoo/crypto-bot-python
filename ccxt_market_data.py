@@ -48,9 +48,9 @@ args = parse_args()
 
 # args
 exchange1 = "binance"
-exchange2 = "acx"
+exchange2 = "poloniex"
 
-symbols = "ETH/USDT"
+symbols = "BTC/USDT"
 
 timeframe = "1d"
 
@@ -167,24 +167,64 @@ if symbols not in exchange2_obj.symbols:
 
 # Get data
 # print("I am started getting data")
-# data of first exchange
+
+# Data of Exchange 1
 
 exchange1_data = exchange1_obj.fetch_ohlcv(symbols, timeframe)
 
 header = ['Timestamp', 'Open', 'High', 'Low', 'Close', 'Volume']
-df = pd.DataFrame(exchange1_data, columns=header).set_index('Timestamp')
-# Save it
-symbol_out = symbols.replace("/","")
-filename = '{}-{}-{}.csv'.format(exchange1, symbol_out,timeframe)
+df1 = pd.DataFrame(exchange1_data, columns=header).set_index('Timestamp')
+print("I have finished getting data: ", exchange1, df1)
 
-# df.to_csv(filename)
-print("I have finished getting data: ", df)
+# # Save it
+# symbol_out = symbols.replace("/","")
+# filename = '{}-{}-{}.csv'.format(exchange1, symbol_out,timeframe)
+# # df.to_csv(filename)
 
-# Get Data
+# Data of Exchange 2
 
+exchange2_data = exchange2_obj.fetch_ohlcv(symbols, timeframe)
+
+# header = ['Timestamp', 'Open', 'High', 'Low', 'Close', 'Volume']
+
+df2 = pd.DataFrame(exchange2_data, columns=header).set_index('Timestamp')
+print("I have finished getting data: ", exchange2, df2)
+# 
 
 # ****************
 
 # finished getting data
 
 # ****************
+
+
+# *****************
+
+# once you get the data, iterate over it and compare time the same time frame for arbitrage opportunities
+
+# *****************
+
+for index, row in df1.iterrows():
+    # df2.loc[df2['Timestamp'] == row["Timestamp"]]
+    print(index)
+    try: 
+        if (df2.loc[index]['Close']) > row['Close']:
+            print ("sell at ", exchange2, df2.loc[index]['Close'], "buy at ", exchange1, row["Close"], "at time ", index);
+
+
+        if (df2.loc[index]['Close']) < row['Close']:
+            print ("buy at ", exchange2, df2.loc[index]['Close'], "sell at ", exchange1, row["Close"], "at time ", index);
+
+
+    except KeyError:
+        print ("No keys for index", index)
+
+
+# Output: 
+#    10 100
+#    11 110
+#    12 120
+
+
+
+
