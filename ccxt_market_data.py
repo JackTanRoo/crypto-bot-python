@@ -58,13 +58,33 @@ exchange1 = "binance"
 exchange5 = "huobipro"
 # exchange6 = "huobipro"
 
+exchange_params = {
+    'binance': {
+        'fees': 0.01
+        'slippage': 0.005
+    },
+    'huobipro': {
+        'fees': 0.02
+        'slippage': 0.005
+    },
+}
 
-margin_of_error = 0
+
+margin_of_error = 0.01
+
 symbols = "DASH/BTC"
 
 timeframe = "5m"
 
+# starting balance in USDT
 
+starting_balance_exchange1_USDT = 1000
+starting_balance_exchange2_USDT = 1000
+
+
+# starting balance in Dash
+starting_balance_exchange1_crypto = 12
+starting_balance_exchange2_crypto = 12
 
 # Get our Exchange
 # Error check if exchange 1 is handled by ccxt
@@ -74,8 +94,6 @@ try:
 
     print("I am the exchange", exchange1)
     print("I am symbols of,", exchange1, exchange1_obj.symbols)
-    print ("balance", exchange1_obj.fetch_balance ())
-
     # print(" I am ccxt", ccxt.binance)
 
 
@@ -159,7 +177,11 @@ except AttributeError:
 
 
 
+# *********
 
+# Get Live Data
+
+# *********
 
 
 # Check if fetching of OHLC Data is supported
@@ -335,8 +357,12 @@ print("I have finished getting data: ", exchange5, df5)
 for index, row in df1.iterrows():
     # df2.loc[df2['Timestamp'] == row["Timestamp"]]
     print(index)
+
+    price_exchange_one = row['Close']
+    price_exchange_five = df5.loc[index]['Close']
+
     try: 
-        if (df5.loc[index]['Close']) > ((1+margin_of_error) * row['Close']):
+        if (is_profitable_to_buy(exchange1, price_exchange_one, exchange5, price_exchange_five, margin_of_error)):
             print ("sell at ", exchange5, df5.loc[index]['Close'], "buy at ", exchange1, row["Close"], "at time ", index)
 
 
@@ -351,11 +377,31 @@ for index, row in df1.iterrows():
 #    11 110
 #    12 120
 
-# *****************
-
-# pull your net position
 
 # *****************
+
+# identify profitable trades after accounting for fees and slippage
+
+# ***************** 
+
+
+# is profitable to buy at exchange 1
+
+def is_profitable_to_buy(exchange_one, price_exchange_one, exchange_two, price_exchange_two, margin_of_error):
+
+    estimated_final_purchase_ price_ex1 = price_exchange_one * (1 + exchange_params[exchange_one].slippage) * (1 + exchange_params[exchange_one].fees)
+
+    estimated_final_sell_ price_ex2 = price_exchange_two * (1 + exchange_params[exchange_two].slippage) * (1 + exchange_params[exchange_two].fees)
+    
+    estimated_final_price_diff = estimated_final_purchase_price_ex1 - estimated_final_sell_price_ex2;
+
+    print ("estimated final price diff", estimated_final_price_diff, "estimated final price diff / base price", estimated_final_price_diff / price_exchange_one)
+
+    if (estimated_final_price_diff / price_exchange_one > margin_of_error):
+        return True
+
+    return False
+
 
 
 
@@ -363,7 +409,54 @@ for index, row in df1.iterrows():
 # *****************
 
 # once you get trade signal
-# make the trade and 
+# make the trade on both exchanges
+
+# *****************
+
+
+# commit a xxx% of the balance to open an order on Exchange 1
+
+
+# commit the same xxx% of balance to open the opposite order on Exchange 2
+
+
+# update net profit position after trade
+
+
+# record trade in object
+
+
+
+# *****************
+
+# analytics
+
+# *****************
+
+# work out number of trades of vertime
+
+
+
+# *********
+
+# Backtest for 1 week
+
+# *********
+
+
+
+# *****************
+
+# graph prices
+
+# *****************
+
+
+
+
+# *****************
+
+# graph trades
 
 # *****************
 
