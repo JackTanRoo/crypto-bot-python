@@ -68,7 +68,7 @@ exchange_params = {
 
 margin_of_error = 0.01
 
-symbols = "DASH/BTC"
+symbols = "BTC/USDT"
 
 timeframe = "5m"
 
