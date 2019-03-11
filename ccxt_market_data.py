@@ -83,9 +83,51 @@ exchange_params = {
 
 margin_of_error = 0.01
 
-symbols = "BTC/USDT"
+symbols = "LTC/USDT"
 
 timeframe = "5m"
+
+
+# 
+
+# unixtime = time.mktime(d.timetuple())
+coinjar_params = {
+    "id_ticker": "",
+    "before_time": "",
+    "after_time": "",
+    "interval": "5m"
+}
+
+# print("I am in coinjar.py", coinjar_endpoint);
+
+
+coinjar_params["id_ticker"] = "LTCAUD"
+
+# end time for the get call is the current time
+
+current_time = int(time.time()) 
+
+coinjar_params["before_time"] = str(current_time)
+
+# Start time for the get call is the current time
+
+coinjar_params["after_time"] = str(current_time - (24 * 60 * 60))
+
+coinjar_endpoint = "https://data.exchange.coinjar.com/products/" + coinjar_params["id_ticker"] + "/candles?before=" + coinjar_params["before_time"] + "&after=" + coinjar_params["after_time"] + "&interval=" + coinjar_params["interval"]
+
+# print(coinjar_endpoint)
+
+
+# https://apilayer.net/api/live
+#     ? access_key = YOUR_ACCESS_KEY
+#     & currencies = AUD,EUR,GBP,PLN
+
+# Get end point to pandas 
+
+# get currency conversion rates
+
+currency_conversion_endpoint = "http://www.apilayer.net/api/live?access_key=97ec6af4d54ae75ef9cf190f8706b6c7&currencies=AUD"
+
 
 # starting balance in USDT
 
@@ -362,43 +404,6 @@ print("I have finished getting data: ", exchange5, df5)
 
 # *********
 
-# unixtime = time.mktime(d.timetuple())
-coinjar_params = {
-    "id_ticker": "",
-    "before_time": "",
-    "after_time": "",
-    "interval": "5m"
-}
-
-# print("I am in coinjar.py", coinjar_endpoint);
-
-
-coinjar_params["id_ticker"] = "BTCAUD"
-
-# end time for the get call is the current time
-
-current_time = int(time.time()) 
-
-coinjar_params["before_time"] = str(current_time)
-
-# Start time for the get call is the current time
-
-coinjar_params["after_time"] = str(current_time - (24 * 60 * 60))
-
-coinjar_endpoint = "https://data.exchange.coinjar.com/products/" + coinjar_params["id_ticker"] + "/candles?before=" + coinjar_params["before_time"] + "&after=" + coinjar_params["after_time"] + "&interval=" + coinjar_params["interval"]
-
-# print(coinjar_endpoint)
-
-
-# https://apilayer.net/api/live
-#     ? access_key = YOUR_ACCESS_KEY
-#     & currencies = AUD,EUR,GBP,PLN
-
-# Get end point to pandas 
-
-# get currency conversion rates
-
-currency_conversion_endpoint = "http://www.apilayer.net/api/live?access_key=97ec6af4d54ae75ef9cf190f8706b6c7&currencies=AUD"
 
 current_currency = urllib.request.urlopen(currency_conversion_endpoint).read()
 

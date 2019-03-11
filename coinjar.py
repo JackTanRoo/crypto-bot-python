@@ -21,8 +21,7 @@ coinjar_params = {
 
 # print("I am in coinjar.py", coinjar_endpoint);
 
-
-coinjar_params["id_ticker"] = "BTCAUD"
+coinjar_params["id_ticker"] = "LTCAUD"
 
 # end time for the get call is the current time
 
@@ -33,6 +32,11 @@ coinjar_params["before_time"] = str(current_time)
 # Start time for the get call is the current time
 
 coinjar_params["after_time"] = str(current_time - (24 * 60 * 60))
+
+coinjar_volume_endpoint = "https://data.exchange.coinjar.com/products/"+coinjar_params["id_ticker"]+ "/stats?at=" + coinjar_params["after_time"]
+
+print("I am volume info", urllib.request.urlopen(coinjar_volume_endpoint ).read())
+
 
 coinjar_endpoint = "https://data.exchange.coinjar.com/products/" + coinjar_params["id_ticker"] + "/candles?before=" + coinjar_params["before_time"] + "&after=" + coinjar_params["after_time"] + "&interval=" + coinjar_params["interval"]
 
