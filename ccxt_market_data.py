@@ -15,6 +15,17 @@ import argparse
 
 import pandas as pd
 
+import urllib.request
+
+import time
+
+import json
+
+import datetime
+
+from dateutil import parser
+
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description='CCXT Market Data Downloader')
@@ -52,16 +63,20 @@ exchange1 = "binance"
 # exchange3 = "bitfinex"
 # exchange4 = "bittrex"
 exchange5 = "huobipro"
-# exchange6 = "huobipro"
+exchange6 = "coinjar"
 
 exchange_params = {
     'binance': {
-        'fees': 0.01,
+        'fees': 0.001,
         'slippage': 0.005
     },
     'huobipro': {
-        'fees': 0.02,
+        'fees': 0.002,
         'slippage': 0.005
+    },
+    'coinjar': {
+        'fees': 0.001,
+        'slippage': 0.01
     },
 }
 
@@ -337,6 +352,97 @@ df5 = pd.DataFrame(exchange5_data, columns=header).set_index('Timestamp')
 print("I have finished getting data: ", exchange5, df5)
 # 
 
+
+# Get Australian Data
+
+
+
+# ***************
+
+
+# *********
+
+# unixtime = time.mktime(d.timetuple())
+coinjar_params = {
+    "id_ticker": "",
+    "before_time": "",
+    "after_time": "",
+    "interval": "5m"
+}
+
+# print("I am in coinjar.py", coinjar_endpoint);
+
+
+coinjar_params["id_ticker"] = "BTCAUD"
+
+# end time for the get call is the current time
+
+current_time = int(time.time()) 
+
+coinjar_params["before_time"] = str(current_time)
+
+# Start time for the get call is the current time
+
+coinjar_params["after_time"] = str(current_time - (24 * 60 * 60))
+
+coinjar_endpoint = "https://data.exchange.coinjar.com/products/" + coinjar_params["id_ticker"] + "/candles?before=" + coinjar_params["before_time"] + "&after=" + coinjar_params["after_time"] + "&interval=" + coinjar_params["interval"]
+
+# print(coinjar_endpoint)
+
+
+# https://apilayer.net/api/live
+#     ? access_key = YOUR_ACCESS_KEY
+#     & currencies = AUD,EUR,GBP,PLN
+
+# Get end point to pandas 
+
+# get currency conversion rates
+
+currency_conversion_endpoint = "http://www.apilayer.net/api/live?access_key=97ec6af4d54ae75ef9cf190f8706b6c7&currencies=AUD"
+
+current_currency = urllib.request.urlopen(currency_conversion_endpoint).read()
+
+current_currency_obj = json.loads(current_currency.decode('utf-8'))
+
+# {'success': True, 'terms': 'https://currencylayer.com/terms', 'privacy': 'https://currencylayer.com/privacy', 'timestamp': 1552276146, 'source': 'USD', 'quotes': {'USDAUD': 1.42115}}
+
+# print("I am contents", current_currency_obj)
+
+# contents is a json string
+contents = urllib.request.urlopen(coinjar_endpoint).read()
+
+# print("I am contents", contents)
+
+header = ['Timestamp', 'Open', 'High', 'Low', 'Close', 'Volume']
+
+contents_obj = json.loads(contents.decode('utf-8'))
+
+df_coinjar = pd.DataFrame(contents_obj, columns=header).set_index('Timestamp')
+
+df_coinjar["Unix"] = ""
+df_coinjar["USDConversion"] = ""
+df_coinjar["USD"] = ""
+
+for index, row in df_coinjar.iterrows():
+    # df2.loc[df2['Timestamp'] == row["Timestamp"]]
+    dt = parser.parse(index)
+
+    unix_time = time.mktime(dt.timetuple())
+
+    df_coinjar.at[index,"Unix"] = int(unix_time) * 1000
+    df_coinjar.at[index,"USDConversion"] = current_currency_obj["quotes"]["USDAUD"]
+    df_coinjar.at[index,"USDConversion"] = current_currency_obj["quotes"]["USDAUD"]
+    df_coinjar.at[index,"USD"] = float(row["Close"]) / float(current_currency_obj["quotes"]["USDAUD"])
+
+    # print(unix_time)
+
+# set unix as the index
+df_coinjar.set_index("Unix", inplace=True)
+
+
+print("i am data frame of coinjar", df_coinjar)
+
+
 # ****************
 
 # finished getting data
@@ -390,20 +496,22 @@ def is_profitable_to_buy(exchange_one, price_exchange_one, exchange_two, price_e
 
 for index, row in df1.iterrows():
     # df2.loc[df2['Timestamp'] == row["Timestamp"]]
-    print(index)
+    # print(index)
 
     price_exchange_one = row['Close']
-    price_exchange_five = df5.loc[index]['Close']
+    # price_exchange_five = df5.loc[index]['Close']
+    if index in df_coinjar.index:
+        price_exchange_six = df_coinjar.loc[index]['USD']
 
-    try: 
-        if (is_profitable_to_buy(exchange1, price_exchange_one, exchange5, price_exchange_five, margin_of_error)):
-            print ("sell at ", exchange5, df5.loc[index]['Close'], "buy at ", exchange1, row["Close"], "at time ", index)
+        try: 
+            if (is_profitable_to_buy(exchange1, price_exchange_one, exchange6, price_exchange_six, margin_of_error)):
+                print ("buy at ", exchange6, df_coinjar.loc[index]['USD'], "sell at ", exchange1, row["Close"], "at time ", index)
 
 
-        if (is_profitable_to_buy(exchange5, price_exchange_five, exchange1, price_exchange_one, margin_of_error)):
-            print ("buy at ", exchange5, df5.loc[index]['Close'], "sell at ", exchange1, row["Close"], "at time ", index)
-    except KeyError:
-        print ("No keys for index", index)
+            if (is_profitable_to_buy(exchange6, price_exchange_six, exchange1, price_exchange_one, margin_of_error)):
+                print ("sell at ", exchange6, df_coinjar.loc[index]['USD'], "buy at ", exchange1, row["Close"], "at time ", index)
+        except KeyError:
+            print ("No keys for index", index)
 
 
 # Output: 
@@ -422,6 +530,14 @@ for index, row in df1.iterrows():
 
 
 # record trade in object
+
+
+
+
+
+
+
+# *********
 
 
 
