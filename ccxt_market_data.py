@@ -25,6 +25,9 @@ import datetime
 
 from dateutil import parser
 
+import matplotlib.pyplot as plt
+
+import numpy as np
 
 
 def parse_args():
@@ -379,6 +382,18 @@ header = ['Timestamp', 'Open', 'High', 'Low', 'Close', 'Volume']
 df1 = pd.DataFrame(exchange1_data, columns=header).set_index('Timestamp')
 print("I have finished getting data: ", exchange1, df1)
 
+
+
+# xxxx
+
+ax1 = plt.subplot(311)
+ax1.set_ylabel("Binance Price of " + symbols)
+
+df1.loc[:, ["Close"]].plot(ax=ax1)
+
+plt.show()
+
+
 # # Save it
 # symbol_out = symbols.replace("/","")
 # filename = '{}-{}-{}.csv'.format(exchange1, symbol_out,timeframe)
@@ -391,7 +406,7 @@ exchange5_data = exchange5_obj.fetch_ohlcv(symbols, timeframe)
 # header = ['Timestamp', 'Open', 'High', 'Low', 'Close', 'Volume']
 
 df5 = pd.DataFrame(exchange5_data, columns=header).set_index('Timestamp')
-print("I have finished getting data: ", exchange5, df5)
+# print("I have finished getting data: ", exchange5, df5)
 # 
 
 
