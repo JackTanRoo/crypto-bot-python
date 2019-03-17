@@ -9,6 +9,7 @@
 
 
 # STORIES
+# create server
 # select crypto to track to track pricing data and make trades
 # select crypto exchange to track pricing data and make trades
 # select fiat pair to track forex rates
@@ -23,3 +24,14 @@
 # track balance after every trade
 # calculate profitability of every trade
 
+# create server
+
+import http.server
+import socketserver
+
+PORT = 3000
+Handler = http.server.SimpleHTTPRequestHandler
+
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print("serving at port", PORT)
+    httpd.serve_forever()
